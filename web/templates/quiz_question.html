@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="bg-white rounded-lg p-6 shadow">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-medium">Question {{ position }} of {{ total }}</h2>
+    </div>
+
+    <p class="mb-4">{{ question.question_text }}</p>
+    <form method="post">{% csrf_token %}
+      <div class="grid gap-3">
+        <label class="block"><input type="radio" name="option" value="A" required> <span class="font-semibold">A.</span> {{ question.option_a|default:'' }}</label>
+        <label class="block"><input type="radio" name="option" value="B"> <span class="font-semibold">B.</span> {{ question.option_b|default:'' }}</label>
+        <label class="block"><input type="radio" name="option" value="C"> <span class="font-semibold">C.</span> {{ question.option_c|default:'' }}</label>
+        <label class="block"><input type="radio" name="option" value="D"> <span class="font-semibold">D.</span> {{ question.option_d|default:'' }}</label>
+      </div>
+      <div class="mt-4 flex items-center justify-between">
+        <a href="{% url 'quiz:home' %}" class="text-sm text-slate-600">Cancel</a>
+        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Submit</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

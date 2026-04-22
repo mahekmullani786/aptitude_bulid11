@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="md:col-span-2 bg-white rounded-lg p-6 shadow">
+      <h2 class="text-2xl font-semibold mb-2">Logical Reasoning</h2>
+      <p class="text-sm text-slate-600 mb-4">Practice aptitude questions focused on logical reasoning. Each session presents questions one-by-one with immediate feedback.</p>
+      <a href="{% url 'quiz:start' %}" class="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md">Start Quiz</a>
+
+      {% if chart_data %}
+        {{ chart_data|json_script:"chart-data" }}
+        <div class="mt-6">
+          <h3 class="text-lg font-medium mb-2">Performance over time</h3>
+          <canvas id="scoreChart" height="120"></canvas>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="bg-white rounded-lg p-6 shadow">
+      <h3 class="text-lg font-medium">Your Progress</h3>
+      {% if user_score %}
+        <p class="mt-2">Answered: {{ user_score.total }}</p>
+        <p>Correct: {{ user_score.correct }}</p>
+
+        <div class="mt-4">
+          <h4 class="text-sm font-medium mb-2">Streak (last 30 days)</h4>
+          <div class="grid grid-cols-7 gap-2">
+            {% for d in streak_days %}
+              <div class="text-center text-xs py-2 rounded {% if d.solved %}bg-green-100{% else %}bg-slate-100{% endif %}">
+                <div class="font-semibold {% if d.solved %}text-green-800{% else %}text-slate-700{% endif %}">{{ d.label }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      {% else %}
+        <p class="mt-2">Login to track your progress and scores.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if chart_data %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      (function(){
+        const raw = document.getElementById('chart-data').textContent;
+        const data = JSON.parse(raw);
+        const labels = data.labels || [];
+        const scores = data.scores || [];
+        const ctx = document.getElementById('scoreChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Correct answers',
+              data: scores,
+              borderColor: 'rgba(99,102,241,1)',
+              backgroundColor: 'rgba(99,102,241,0.1)',
+              tension: 0.3,
+              fill: true,
+            }]
+          },
+          options: {
+            scales: {
+              y: { beginAtZero: true, ticks: {stepSize: 1} }
+            }
+          }
+        });
+      })();
+    </script>
+  {% endif %}
+
+{% endblock %}
